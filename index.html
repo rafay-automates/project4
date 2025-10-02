@@ -96,7 +96,7 @@
       document.getElementById("results").innerHTML = "Loading...";
 
       try {
-        const response = await fetch(`http://127.0.0.1:8000/search?query=${encodeURIComponent(query)}`);
+        const response = await fetch(`https://rafay4.onrender.com/search?query=${encodeURIComponent(query)}`);
         const data = await response.json();
         fullData = data.results || [];
         renderTable();
@@ -138,3 +138,4 @@
   </script>
 </body>
 </html>
+
