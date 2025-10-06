@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Keyword Data Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    input[type="text"], select {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-right: 10px;
+    }
+    input[type="text"] {
+      width: 50%;
+    }
+    button {
+      padding: 10px 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+    #loadMore {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      border-radius: 8px;
+      background: #28a745;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+    #loadMore:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔎 Keyword Data Viewer</h1>
+  <div class="container">
+    <div style="margin-bottom: 10px;">
+      <input type="text" id="query" placeholder="Enter a keyword..."/>
+      <select id="location">
+        <option value="">🌍 Anywhere</option>
+        <option value="2840">🇺🇸 USA</option>
+        <option value="2276">🇩🇪 Germany</option>
+        <option value="2826">🇬🇧 UK</option>
+        <option value="2724">🇪🇸 Spain</option>
+        <option value="2250">🇫🇷 France</option>
+      </select>
+      <button onclick="fetchData()">Search</button>
+    </div>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    let fullData = [];
+    let rowsToShow = 50;
+
+    async function fetchData() {
+      const query = document.getElementById("query").value;
+      const location = document.getElementById("location").value;
+      if (!query) {
+        alert("Please enter a keyword!");
+        return;
+      }
+
+      rowsToShow = 50;
+      document.getElementById("results").innerHTML = "Loading...";
+
+      try {
+        const url = `https://rafay4.onrender.com/search?query=${encodeURIComponent(query)}&location=${location}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        fullData = data.results || [];
+        renderTable();
+      } catch (err) {
+        console.error(err);
+        document.getElementById("results").innerHTML = "Error fetching data.";
+      }
+    }
+
+    function renderTable() {
+      if (fullData.length === 0) {
+        document.getElementById("results").innerHTML = "<p>No results found.</p>";
+        return;
+      }
+
+      let html = "<table><tr><th>Keyword</th><th>CI</th><th>Search Volume</th><th>Bid Low</th><th>Bid High</th></tr>";
+      fullData.slice(0, rowsToShow).forEach(row => {
+        html += `<tr>
+          <td>${row.Keyword}</td>
+          <td>${row.CI}</td>
+          <td>${row["Search Volume"]}</td>
+          <td>${row["Bid Low"]}</td>
+          <td>${row["Bid High"]}</td>
+        </tr>`;
+      });
+      html += "</table>";
+
+      if (rowsToShow < fullData.length) {
+        html += `<button id="loadMore" onclick="loadMore()">⬇️ Show More Results</button>`;
+      }
+
+      document.getElementById("results").innerHTML = html;
+    }
+
+    function loadMore() {
+      rowsToShow += 50;
+      renderTable();
+    }
+  </script>
+</body>
+</html>
